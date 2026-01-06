@@ -1,0 +1,33 @@
+version: '3.3'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: dev-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Developer
+      - MSSQL_AGENT_ENABLED=true
+    ports:
+      - "1433:1433"
+      - "1434:1434"  # Для DAC
+    volumes:
+      - ./data:/var/opt/mssql/data
+      - ./logs:/var/opt/mssql/log
+      - ./secrets:/var/opt/mssql/secrets
+      - ./backups:/var/opt/mssql/backup
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "YourStrong@Passw0rd" -Q "SELECT 1" || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+#      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - dev-network
+
+networks:
+  dev-network:
+    driver: bridge
