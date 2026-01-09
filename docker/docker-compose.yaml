@@ -1,30 +1,33 @@
-version: '3.3'
+version: "3.8"
 
 services:
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver2022
-    restart: always
+    container_name: mssql-server
+    restart: unless-stopped
+
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "StrongPassword123!"
+      MSSQL_PID: "Developer"
+      MSSQL_SA_PASSWORD: "YourStrong!Passw0rd"
+
     ports:
       - "1433:1433"
+
     volumes:
       - mssql_data:/var/opt/mssql
-      - ./backup:/var/opt/mssql/backup   # локальная папка с .bak файлами
+      - ./backup:/backups:ro
+      - ./scripts:/scripts:ro
 
-  mssql-tools:
-    image: mcr.microsoft.com/mssql-tools
-    container_name: sqlserver-tools
-    depends_on:
-      - mssql
-    stdin_open: true
-    tty: true
-    # пробрасываем ту же сеть, чтобы sqlcmd видел сервер
-    network_mode: "host"
-    volumes:
-      - ./backup:/var/opt/mssql/backup
+    entrypoint: ["/scripts/entrypoint.sh"]
+
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -U sa -P 'YourStrong!Passw0rd' -C -Q 'SELECT 1'" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+
 
 volumes:
   mssql_data:
