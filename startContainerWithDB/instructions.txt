@@ -1,2 +1,6 @@
 docker compose down -v
 docker compose up -d
+
+
+sudo chown -R 10001:0 bddata
+sudo chmod -R 770 bddata
