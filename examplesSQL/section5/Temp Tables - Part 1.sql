@@ -14,7 +14,6 @@ FROM #TempSales
 WHERE OrderRunk <= 10
 GROUP BY OrderMonth
 
-
 SELECT
     A.OrderMonth ,
     A.Top10Due ,
@@ -23,3 +22,6 @@ FROM #Top10 A
     LEFT JOIN #Top10 B
 ON A.OrderMonth = DATEADD(MONTH, 1, B.OrderMonth )
 ORDER BY A.OrderMonth
+
+DROP TABLE #TempSales
+DROP TABLE #Top10
