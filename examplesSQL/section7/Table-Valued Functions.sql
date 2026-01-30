@@ -10,3 +10,5 @@ CREATE FUNCTION Production.ufn_ProductsByColor(@Color NVARCHAR(15))
     FROM Production.Product
     WHERE LOWER(Color) = LOWER(@Color)
 )
+
+SELECT * FROM Production.ufn_ProductsByColor('blue')
